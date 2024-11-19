@@ -3,38 +3,59 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 
 Parameters:
+
   ApiGatewayId:
     Type: SSM::Parameter::Value<String>
     Default: /cuffney/main/api-gateway/id
     Description: The API Gateway ID for the Slack Webhook API
+    
+  SourceBucket:
+    Type: String
+    Default: com.cuffney.slack-service-source
+    Description: The S3 bucket where the Rust Lambda source is stored
 
 Resources:
 
-  SlackWebhook:
-
+  SlackWebhookFunction:
     Type: AWS::Lambda::Function
     Properties:
-      MemorySize: 128
-      Handler: bootstrap
-      Runtime: provided.al2023
-      Timeout: 5
-      CodeUri: http/slack_webhook/target/lambda/slack_webhook
+      FunctionName: slack-webhook
+      Handler: bootstrap # Rust lambda uses "bootstrap" as the handler
+      Role: arn:aws:iam::${AWS::AccountId}:role/lambda-role
+      Memory: 128
+      Timeout: 6
+      Code:
+        S3Bucket: !Ref SourceBucket
+        S3Key: slack_webhook.zip
+      Runtime: "provided.al2" # custom runtime for Rust
+      Role: !GetAtt SlackWebhookExecutionRole.Arn
       Environment:
         Variables:
-          SLACK_SECRET_TOKEN: some-secret-token
-      iamRoleStatements:
-        - Effect: Allow
-          Action:
-            - logs:CreateLogGroup
-            - logs:CreateLogStream
-            - logs:PutLogEvents
-          Resource: arn:aws:logs:*:*:*
+          SLACK_TOKEN: "some-token"
       Events:
-        SlackWebhookApiEvent:
+        SlackWebhook:
           Type: Api
           Properties:
-            HttpApiId: !Ref ApiGatewayId
-            Path: /slack 
-            Method: post  
 
-        
+  SlackWebhookExecutionRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      RoleName: "RustLambdaExecutionRole"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service: "lambda.amazonaws.com"
+            Action: "sts:AssumeRole"
+      Policies:
+        - PolicyName: "RustLambdaPolicy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action:
+                  - "logs:CreateLogGroup"
+                  - "logs:CreateLogStream"
+                  - "logs:PutLogEvents"
+                Resource: "arn:aws:logs:*:*:*"
