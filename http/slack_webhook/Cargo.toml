@@ -1,5 +1,5 @@
 [package]
-name = "slack-service"
+name = "slack_webhook"
 version = "0.1.0"
 edition = "2021"
 

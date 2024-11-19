@@ -1,0 +1,40 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Transform: AWS::Serverless-2016-10-31
+
+Parameters:
+  ApiGatewayId:
+    Type: SSM::Parameter::Value<String>
+    Default: /cuffney/main/api-gateway/id
+    Description: The API Gateway ID for the Slack Webhook API
+
+Resources:
+
+  SlackWebhook:
+
+    Type: AWS::Lambda::Function
+    Properties:
+      MemorySize: 128
+      Handler: bootstrap
+      Runtime: provided.al2023
+      Timeout: 5
+      CodeUri: http/slack_webhook/target/lambda/slack_webhook
+      Environment:
+        Variables:
+          SLACK_SECRET_TOKEN: some-secret-token
+      iamRoleStatements:
+        - Effect: Allow
+          Action:
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+          Resource: arn:aws:logs:*:*:*
+      Events:
+        SlackWebhookApiEvent:
+          Type: Api
+          Properties:
+            HttpApiId: !Ref ApiGatewayId
+            Path: /slack 
+            Method: post  
+
+        

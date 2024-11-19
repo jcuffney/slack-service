@@ -47,7 +47,7 @@ mod tests {
     #[tokio::test]
     async fn test_http_handler_with_query_string() {
         let mut query_string_parameters: HashMap<String, String> = HashMap::new();
-        query_string_parameters.insert("name".into(), "init-project".into());
+        query_string_parameters.insert("name".into(), "slack_webhook".into());
 
         let request = Request::default()
             .with_query_string_parameters(query_string_parameters);
@@ -60,7 +60,7 @@ mod tests {
 
         assert_eq!(
             body_string,
-            "Hello init-project, this is an AWS Lambda HTTP request"
+            "Hello slack_webhook, this is an AWS Lambda HTTP request"
         );
     }
 }

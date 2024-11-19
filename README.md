@@ -2,6 +2,11 @@
 
 > This service is responsible for sending/receiving messages to/from Slack.
 
-build with [Cargo Lambda](https://www.cargo-lambda.info/)
+## Functions
 
-`cargo lambda invoke slack-service --data-example apigw-request`
+- Events
+    - `on_message_published`
+- Http
+    `/slack` -> `slack_webhook`
+
+`cargo lambda build --release`

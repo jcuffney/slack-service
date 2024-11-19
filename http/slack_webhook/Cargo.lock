@@ -828,7 +828,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "slack-service"
+name = "slack_webhook"
 version = "0.1.0"
 dependencies = [
  "lambda_http",
