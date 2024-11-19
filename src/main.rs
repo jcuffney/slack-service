@@ -1,13 +1,10 @@
-use lambda_runtime::{service_fn, Error, LambdaEvent};
-
-/// The Lambda handler function
-async fn handle_event(_: LambdaEvent<()>) -> Result<&'static str, Error> {
-    Ok("Hello, World!")
-}
+use lambda_http::{run, service_fn, tracing, Error};
+mod http_handler;
+use http_handler::function_handler;
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
-    let func = service_fn(handle_event);
-    lambda_runtime::run(func).await?;
-    Ok(())
+    tracing::init_default_subscriber();
+
+    run(service_fn(function_handler)).await
 }
