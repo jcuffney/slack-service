@@ -1,2 +1,2 @@
 [workspace]
-members = ["events/on_message_send", "http/webhook"]
+members = ["events/on_message_send", "http/webhook", "lib/slack"]
