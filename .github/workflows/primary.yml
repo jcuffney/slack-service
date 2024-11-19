@@ -31,3 +31,24 @@ jobs:
     - name: Run tests
       run: cargo test
       working-directory: ./http/slack_webhook
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4.0.2
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: Deploy to AWS
+      run: |
+        SOURCE_BUCKET=com.cuffney.slack-service-source
+        STACK_NAME=slack-service
+        # check if $SOURCE_BUCKET exists
+        if aws s3api head-bucket --bucket $SOURCE_BUCKET 2>/dev/null; then
+          echo "Bucket $SOURCE_BUCKET exists"
+        else
+          echo "Bucket $SOURCE_BUCKET does not exist"
+          aws s3api create-bucket --bucket $SOURCE_BUCKET --region $AWS_REGION
+        fi
+        aws cloudformation deploy --template-file infra/template.yml --stack-name $STACK_NAME --capabilities CAPABILITY_IAM
+
