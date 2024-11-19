@@ -42,3 +42,13 @@ jobs:
         pip install cargo-lambda
         cargo lambda build --release
         cargo lambda deploy slack-service
+      env:
+        AWS_DEFAULT_REGION: <YOUR-REGION>
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+    - name: Upload build artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: build 
+        path: target/lambda/slack-service
