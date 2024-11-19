@@ -2,11 +2,8 @@
 
 > This service is responsible for sending/receiving messages to/from Slack.
 
-## Functions
+Rust workspaces are a way to manage multiple Rust projects that are related to each other. This workspace contains the following projects:
+- `events/on_message_send`
+- `http/webhook`
 
-- Events
-    - `on_message_published`
-- Http
-    `/slack` -> `slack_webhook`
-
-`cargo lambda build --release`
+`cargo run --bin <webhook|on_message_send>`
