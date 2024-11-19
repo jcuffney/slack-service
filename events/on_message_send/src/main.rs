@@ -1,3 +1,5 @@
+use slack::send_message;
+
 fn main() {
-    println!("Hello, world!");
+    send_message("#general");
 }
